@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import {Formik, Form} from "formik";
 import {COLUMNS, FORM_INITIAL_STATE} from './constants';
-import {getAll, deleteItem, findByName, findByAccountAndBic} from './actions';
+import {getAll, deleteItem, findByName, findByAccountAndBic, changeItem, addNewItem} from './actions';
 import {DataGrid} from '@material-ui/data-grid';
 import EditForm from './components/EditForm'
 
@@ -22,6 +22,7 @@ const App = () => {
     const [counterpartyFormVisible, setCounterpartyFormVisible] = useState(false);
     const [editMode, setEditMode] = useState(false);
     const [formValue, setFormValue] = useState(FORM_INITIAL_STATE);
+    const [editFormValue, setEditFormValue] = useState({})
     const outerTheme = createMuiTheme({
         palette: {
             primary: {
@@ -87,8 +88,20 @@ const App = () => {
         kpp: null
     }), [editMode, selectedField])
 
-    const onSubmitEditForm = (v) => {
-        console.log(v)
+    const onSubmitEditForm = () => {
+        if (editFormValue) {
+            if (editMode) {
+                changeItem(editFormValue).then(response => {
+                    console.log(response);
+                    performGetAll();
+                });
+            } else {
+                addNewItem(editFormValue).then(response => {
+                    console.log(response);
+                    performGetAll();
+                });
+            }
+        }
     }
 
     return (
@@ -167,6 +180,7 @@ const App = () => {
                                     <Grid item>
                                         <Button onClick={() => {
                                             setEditMode(true);
+                                            setEditFormValue(selectedField);
                                             setCounterpartyFormVisible(true);
                                         }} disabled={!selectedField}>
                                             Редактировать
@@ -180,14 +194,19 @@ const App = () => {
                                 </Grid>
                             </Grid>
                             <Grid item xs={12}>
-                                <DataGrid columns={COLUMNS} rows={counterparties} pageSize={20}
+                                <DataGrid columns={COLUMNS}
+                                          rows={counterparties}
+                                          pageSize={20}
                                           onRowClick={v => {
                                               setSelectedField(counterparties.find(it => it.id === v.id))
                                           }}
                                           autoHeight/>
                             </Grid>
                             {counterpartyFormVisible && (
-                                <EditForm initialState={editFormInitialState} onSubmit={onSubmitEditForm}
+                                <EditForm initialState={editFormInitialState}
+                                          onSubmit={onSubmitEditForm}
+                                          onFieldChange={setEditFormValue}
+                                          formValue={editFormValue}
                                           onClose={() => setCounterpartyFormVisible(false)}/>)}
                         </Grid>
                     </Grid>

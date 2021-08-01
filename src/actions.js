@@ -15,3 +15,28 @@ export const findByName = async (name) => {
 export const findByAccountAndBic = async (account, bic) => {
     return (await fetch(`/counterparty?account=${account}&bic=${bic}`, {method: "GET"})).json();
 }
+
+export const addNewItem = async (form) => {
+    return (await fetch('/counterparty',
+        {
+            method: "POST",
+            body: JSON.stringify(form),
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })).json();
+}
+
+export const changeItem = async (form) => {
+    return (await fetch('/counterparty',
+        {
+            method: "PUT",
+            body: JSON.stringify(form),
+            headers: {
+                'Content-Type': 'application/json'
+                // 'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        }
+    )).json();
+}
